@@ -1,0 +1,96 @@
+/*
+Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+*/
+package cmd
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"github.com/spf13/cobra"
+)
+
+// day2Cmd represents the day2 command
+var day2Cmd = &cobra.Command{
+	Use:   "day2",
+	Short: "A brief description of your command",
+	Run:   day2Main,
+}
+
+func init() {
+	rootCmd.AddCommand(day2Cmd)
+}
+
+func day2Main(cmd *cobra.Command, args []string) {
+	// day2MainStep1(cmd, args)
+	day2MainStep2(cmd, args)
+}
+
+func possibleGame(line string) int {
+	parts := strings.Split(line, ":")
+
+	/// extract game id
+	// gameID := strings.Split(parts[0], " ")
+	// id, err := strconv.Atoi(gameID[1])
+	// :wfailIf(err)
+
+	// extract the cubes
+	r := regexp.MustCompile(`\d+ (blue|green|red)`)
+	matches := r.FindAllString(parts[1], -1)
+
+	red, green, blue := 0, 0, 0
+
+	for _, m := range matches {
+		mm := strings.Split(m, " ")
+		count, err := strconv.Atoi(mm[0])
+		failIf(err)
+		color := mm[1]
+
+		switch color {
+		case "red":
+			red = max(red, count)
+		case "blue":
+			blue = max(blue, count)
+		case "green":
+			green = max(green, count)
+		}
+	}
+	return red * green * blue
+}
+
+func day2MainStep1(cmd *cobra.Command, args []string) {
+	f, err := os.Open("day2_1.txt")
+	failIf(err)
+
+	scanner := bufio.NewScanner(f)
+
+	sum := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		sum += possibleGame(line)
+	}
+	fmt.Println(sum)
+	failIf(scanner.Err())
+}
+
+/// solution to step 2
+
+func day2MainStep2(cmd *cobra.Command, args []string) {
+	f, err := os.Open("day2.txt")
+	failIf(err)
+
+	scanner := bufio.NewScanner(f)
+	sum := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		power := possibleGame(line)
+		fmt.Println(power)
+		sum += power
+	}
+	fmt.Println(sum)
+	failIf(scanner.Err())
+}

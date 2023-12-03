@@ -1,4 +1,4 @@
-day=day1
+day=day2
 
 default: $(day)
 .PHONY: default $(day)
